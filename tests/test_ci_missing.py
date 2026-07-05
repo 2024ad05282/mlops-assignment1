@@ -20,7 +20,10 @@ def test_preprocess_creates_binary_target_and_no_missing_values():
 
 
 def test_train_and_evaluate_returns_model_artifacts(trained_result):
-    assert trained_result["best_model"] in {"logistic_regression", "random_forest_tuned"}
+    assert trained_result["best_model"] in {
+        "logistic_regression",
+        "random_forest_tuned"
+    }
     assert trained_result["saved_pipeline_path"].endswith(".joblib")
     assert trained_result["split"]["train_shape"][0] > 0
     assert trained_result["split"]["test_shape"][0] > 0

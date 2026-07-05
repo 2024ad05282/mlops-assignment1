@@ -667,26 +667,67 @@ def train_and_evaluate() -> dict[str, object]:
     pr_rf_tuned_path = None
 
     if logistic_test['y_scores'] is not None:
-        roc_lr_path = plot_roc_curve(y_test, logistic_test['y_scores'], 'logistic_regression', figures_dir)
-        pr_lr_path = plot_precision_recall_curve(y_test, logistic_test['y_scores'], 'logistic_regression', figures_dir)
+        roc_lr_path = plot_roc_curve(
+            y_test, logistic_test['y_scores'], 'logistic_regression', figures_dir
+        )
+        pr_lr_path = plot_precision_recall_curve(
+            y_test, logistic_test['y_scores'], 'logistic_regression', figures_dir
+        )
     if rf_baseline_test['y_scores'] is not None:
-        roc_rf_pre_path = plot_roc_curve(y_test, rf_baseline_test['y_scores'], 'random_forest_pre_tuning', figures_dir)
-        pr_rf_pre_path = plot_precision_recall_curve(y_test, rf_baseline_test['y_scores'], 'random_forest_pre_tuning', figures_dir)
+        roc_rf_pre_path = plot_roc_curve(
+            y_test, rf_baseline_test['y_scores'],
+            'random_forest_pre_tuning', figures_dir
+        )
+        pr_rf_pre_path = plot_precision_recall_curve(
+            y_test, rf_baseline_test['y_scores'],
+            'random_forest_pre_tuning', figures_dir
+        )
     if rf_test['y_scores'] is not None:
-        roc_rf_tuned_path = plot_roc_curve(y_test, rf_test['y_scores'], 'random_forest_tuned', figures_dir)
-        pr_rf_tuned_path = plot_precision_recall_curve(y_test, rf_test['y_scores'], 'random_forest_tuned', figures_dir)
+        roc_rf_tuned_path = plot_roc_curve(
+            y_test, rf_test['y_scores'], 'random_forest_tuned', figures_dir
+        )
+        pr_rf_tuned_path = plot_precision_recall_curve(
+            y_test, rf_test['y_scores'], 'random_forest_tuned', figures_dir
+        )
 
-    confusion_matrix_lr = plot_confusion_matrix(logistic_test['confusion_matrix'], 'logistic_regression', figures_dir)
-    confusion_matrix_rf_pre = plot_confusion_matrix(rf_baseline_test['confusion_matrix'], 'random_forest_pre_tuning', figures_dir)
-    confusion_matrix_rf_tuned = plot_confusion_matrix(rf_test['confusion_matrix'], 'random_forest_tuned', figures_dir)
-    feature_importance_path = plot_feature_importance(best_random_forest, numeric_features, categorical_features, figures_dir)
+    confusion_matrix_lr = plot_confusion_matrix(
+        logistic_test['confusion_matrix'], 'logistic_regression', figures_dir
+    )
+    confusion_matrix_rf_pre = plot_confusion_matrix(
+        rf_baseline_test['confusion_matrix'], 'random_forest_pre_tuning',
+        figures_dir
+    )
+    confusion_matrix_rf_tuned = plot_confusion_matrix(
+        rf_test['confusion_matrix'], 'random_forest_tuned', figures_dir
+    )
+    feature_importance_path = plot_feature_importance(
+        best_random_forest, numeric_features, categorical_features, figures_dir
+    )
 
-    classification_report_lr_path = os.path.join(report_dir, 'classification_report_logistic_regression.txt')
-    classification_report_rf_pre_path = os.path.join(report_dir, 'classification_report_random_forest_pre_tuning.txt')
-    classification_report_rf_tuned_path = os.path.join(report_dir, 'classification_report_random_forest_tuned.txt')
-    _save_classification_report(logistic_test['classification_report'], 'Logistic Regression', classification_report_lr_path)
-    _save_classification_report(rf_baseline_test['classification_report'], 'Random Forest (pre-tuning)', classification_report_rf_pre_path)
-    _save_classification_report(rf_test['classification_report'], 'Random Forest (tuned)', classification_report_rf_tuned_path)
+    classification_report_lr_path = os.path.join(
+        report_dir, 'classification_report_logistic_regression.txt'
+    )
+    classification_report_rf_pre_path = os.path.join(
+        report_dir, 'classification_report_random_forest_pre_tuning.txt'
+    )
+    classification_report_rf_tuned_path = os.path.join(
+        report_dir, 'classification_report_random_forest_tuned.txt'
+    )
+    _save_classification_report(
+        logistic_test['classification_report'],
+        'Logistic Regression',
+        classification_report_lr_path
+    )
+    _save_classification_report(
+        rf_baseline_test['classification_report'],
+        'Random Forest (pre-tuning)',
+        classification_report_rf_pre_path
+    )
+    _save_classification_report(
+        rf_test['classification_report'],
+        'Random Forest (tuned)',
+        classification_report_rf_tuned_path
+    )
 
     model_selection_report_path = os.path.join(report_dir, 'model_selection.md')
     _save_model_selection_report({
