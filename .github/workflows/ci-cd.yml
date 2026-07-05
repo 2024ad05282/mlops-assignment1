@@ -7,40 +7,84 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
+  Lint:
+    name: Lint
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Set up Python
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Lint with flake8
+      - name: Run flake8 lint checks
         run: |
           flake8 src tests
 
-      - name: Run tests
-        run: |
-          pytest tests -q
+  Test:
+    name: Test
+    needs: Lint
+    runs-on: ubuntu-latest
 
-      - name: Train model
-        run: |
-          python src/train.py
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Upload workflow artifacts
-        uses: actions/upload-artifact@v4
-        if: always()
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
         with:
-          name: mlops-artifacts
-          path: |
-            models/
-            reports/
-            mlruns/
-          if-no-files-found: ignore
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pytest unit tests
+        run: |
+          pytest tests -v --cov=. --cov-report=term
+
+  Build:
+    name: Build
+    needs: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verify application imports
+        run: |
+          python -c "from src.model import train_and_evaluate; print('Import check passed')"
+
+      - name: Run build validation
+        run: |
+          python -m compileall .
+
+      - name: Print build success message
+        run: |
+          echo "Build validation completed successfully."
