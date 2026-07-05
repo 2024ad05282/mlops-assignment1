@@ -438,7 +438,7 @@ def _log_mlflow_run(
 
         mlflow.sklearn.log_model(
             pipeline,
-            name='model',
+            artifact_path='model',
             serialization_format='cloudpickle'
         )
 
