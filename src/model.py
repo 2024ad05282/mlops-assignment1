@@ -5,7 +5,6 @@ import mlflow.sklearn
 import os
 import pickle
 import platform
-import sys
 import joblib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,15 +15,27 @@ from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import (accuracy_score, classification_report, confusion_matrix,
-                             f1_score, precision_score, recall_score,
-                             roc_auc_score, precision_recall_curve, roc_curve)
-from sklearn.model_selection import GridSearchCV, StratifiedKFold, cross_validate, train_test_split
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+    precision_recall_curve,
+    roc_curve,
+)
+from sklearn.model_selection import (
+    GridSearchCV,
+    StratifiedKFold,
+    cross_validate,
+    train_test_split,
+)
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 try:
-    import skl2onnx
     from skl2onnx import convert_sklearn
     from skl2onnx.common.data_types import FloatTensorType
     ONNX_ENABLED = True
@@ -81,7 +92,9 @@ def infer_feature_types(
     - The heuristic relies on the training set only, so it stays consistent with
       production preprocessing.
     """
-    object_columns = X.select_dtypes(include=['object', 'category', 'bool']).columns.tolist()
+    object_columns = X.select_dtypes(
+        include=['object', 'category', 'bool']
+    ).columns.tolist()
     numeric_columns = X.select_dtypes(include=[np.number]).columns.tolist()
 
     categorical_from_numeric = []
@@ -90,8 +103,12 @@ def infer_feature_types(
         if unique_values <= unique_threshold:
             categorical_from_numeric.append(col)
 
-    categorical_features = sorted(set(object_columns + categorical_from_numeric))
-    numeric_features = [col for col in numeric_columns if col not in categorical_features]
+    categorical_features = sorted(
+        set(object_columns + categorical_from_numeric)
+    )
+    numeric_features = [
+        col for col in numeric_columns if col not in categorical_features
+    ]
 
     return numeric_features, categorical_features
 
@@ -172,7 +189,12 @@ def _ensure_directory(path: str) -> None:
     os.makedirs(path, exist_ok=True)
 
 
-def cross_validate_model(pipeline: Pipeline, X: pd.DataFrame, y: pd.Series, cv) -> dict[str, tuple[float, float]]:
+def cross_validate_model(
+    pipeline: Pipeline,
+    X: pd.DataFrame,
+    y: pd.Series,
+    cv,
+) -> dict[str, tuple[float, float]]:
     """Evaluate a pipeline using stratified cross-validation."""
     scoring = {
         'accuracy': 'accuracy',
@@ -197,7 +219,11 @@ def cross_validate_model(pipeline: Pipeline, X: pd.DataFrame, y: pd.Series, cv) 
     }
 
 
-def evaluate_on_test(pipeline: Pipeline, X_test: pd.DataFrame, y_test: pd.Series) -> dict[str, object]:
+def evaluate_on_test(
+    pipeline: Pipeline,
+    X_test: pd.DataFrame,
+    y_test: pd.Series,
+) -> dict[str, object]:
     """Evaluate a trained pipeline on the test set and return metrics."""
     y_pred = pipeline.predict(X_test)
     if hasattr(pipeline, 'predict_proba'):
@@ -212,8 +238,12 @@ def evaluate_on_test(pipeline: Pipeline, X_test: pd.DataFrame, y_test: pd.Series
         'precision': precision_score(y_test, y_pred),
         'recall': recall_score(y_test, y_pred),
         'f1': f1_score(y_test, y_pred),
-        'roc_auc': roc_auc_score(y_test, y_scores) if y_scores is not None else None,
-        'classification_report': classification_report(y_test, y_pred, output_dict=True),
+        'roc_auc': (
+            roc_auc_score(y_test, y_scores) if y_scores is not None else None
+        ),
+        'classification_report': classification_report(
+            y_test, y_pred, output_dict=True
+        ),
         'confusion_matrix': confusion_matrix(y_test, y_pred).tolist(),
         'y_test': y_test,
         'y_scores': y_scores
@@ -255,7 +285,12 @@ def plot_roc_curve(
     """Save an ROC curve plot for a model."""
     fpr, tpr, _ = roc_curve(y_test, y_scores)
     fig, ax = plt.subplots(figsize=(7, 6))
-    ax.plot(fpr, tpr, label=f'ROC curve (AUC = {roc_auc_score(y_test, y_scores):.3f})', color='darkorange')
+    ax.plot(
+        fpr,
+        tpr,
+        label=f'ROC curve (AUC = {roc_auc_score(y_test, y_scores):.3f})',
+        color='darkorange',
+    )
     ax.plot([0, 1], [0, 1], linestyle='--', color='gray')
     ax.set_title(f'ROC Curve - {model_name}')
     ax.set_xlabel('False Positive Rate')
@@ -300,13 +335,20 @@ def plot_feature_importance(
     model = pipeline.named_steps['model']
     preprocessor = pipeline.named_steps['preprocessor']
     importance = model.feature_importances_
-    feature_names = _get_preprocessed_feature_names(preprocessor, numeric_features, categorical_features)
+    feature_names = _get_preprocessed_feature_names(
+        preprocessor, numeric_features, categorical_features
+    )
 
-    importance_df = pd.DataFrame({'feature': feature_names, 'importance': importance})
+    importance_df = pd.DataFrame(
+        {'feature': feature_names, 'importance': importance}
+    )
     importance_df = importance_df.sort_values('importance', ascending=False).head(20)
 
     fig, ax = plt.subplots(figsize=(10, 8))
-    sns.barplot(x='importance', y='feature', data=importance_df, ax=ax, color='royalblue')
+    sns.barplot(
+        x='importance', y='feature', data=importance_df,
+        ax=ax, color='royalblue'
+    )
     ax.set_title('Random Forest Feature Importances')
     ax.set_xlabel('Importance')
     ax.set_ylabel('Feature')
@@ -325,10 +367,17 @@ def _print_classification_report(report: dict, model_name: str) -> None:
 
 def _print_confusion_matrix(cm: list[list[int]], model_name: str) -> None:
     print(f'Confusion Matrix for {model_name}')
-    print(pd.DataFrame(cm, index=['Actual 0', 'Actual 1'], columns=['Predicted 0', 'Predicted 1']))
+    print(pd.DataFrame(
+        cm,
+        index=['Actual 0', 'Actual 1'],
+        columns=['Predicted 0', 'Predicted 1'],
+    ))
 
 
-def _print_cv_summary(cv_results: dict[str, tuple[float, float]], model_name: str) -> None:
+def _print_cv_summary(
+    cv_results: dict[str, tuple[float, float]],
+    model_name: str,
+) -> None:
     print(f'Cross-validation summary for {model_name}')
     for metric, (mean_score, std_score) in cv_results.items():
         print(f'  {metric}: {mean_score:.4f} ± {std_score:.4f}')
@@ -339,7 +388,11 @@ def _save_comparison_table(comparison: pd.DataFrame, output_path: str) -> str:
     return output_path
 
 
-def _save_classification_report(report: dict, model_name: str, output_path: str) -> str:
+def _save_classification_report(
+    report: dict,
+    model_name: str,
+    output_path: str,
+) -> str:
     df_report = pd.DataFrame(report).transpose()
     lines = [f'# Classification Report - {model_name}', '']
     lines.extend(df_report.to_string().splitlines())
@@ -356,7 +409,7 @@ def _log_mlflow_run(
     cv_results: dict[str, tuple[float, float]],
     test_results: dict[str, object],
     artifact_files: list[str],
-    register_model: bool = False
+    register_model: bool = False,
 ) -> None:
     mlflow.set_experiment('Heart Disease Classification')
     with mlflow.start_run(run_name=run_name):
@@ -399,7 +452,7 @@ def _log_mlflow_run(
 
 def _save_model_selection_report(
     results: dict,
-    output_path: str
+    output_path: str,
 ) -> None:
     comparison = results['comparison'].reset_index()
     comparison_lines = []
@@ -407,7 +460,9 @@ def _save_model_selection_report(
     comparison_lines.append('|---|---|---|---|---|---|')
     for _, row in comparison.iterrows():
         comparison_lines.append(
-            f"| {row['model']} | {row['accuracy']:.4f} | {row['precision']:.4f} | {row['recall']:.4f} | {row['f1']:.4f} | {row['roc_auc']:.4f} |"
+            f"| {row['model']} | {row['accuracy']:.4f} | "
+            f"{row['precision']:.4f} | {row['recall']:.4f} | "
+            f"{row['f1']:.4f} | {row['roc_auc']:.4f} |"
         )
 
     lines = [
@@ -422,7 +477,8 @@ def _save_model_selection_report(
         '',
         '## Hyperparameter tuning process',
         '- Random Forest tuned with `GridSearchCV` optimizing ROC-AUC',
-        '- Search grid included `n_estimators`, `max_depth`, `min_samples_split`, and `min_samples_leaf`',
+        '- Search grid included `n_estimators`, `max_depth`, '
+        '`min_samples_split`, and `min_samples_leaf`',
         '',
         '## Best Random Forest parameters',
         f'- {results["cross_validation"]["best_random_forest_params"]}',
@@ -438,10 +494,12 @@ def _save_model_selection_report(
         *comparison_lines,
         '',
         '## Why ROC-AUC was chosen',
-        '- ROC-AUC provides a threshold-independent measure of ranking quality and is robust when the classes are imbalanced.',
+        '- ROC-AUC provides a threshold-independent measure of ranking '
+        'quality and is robust when the classes are imbalanced.',
         '',
         '## Final model selection',
-        f'- Selected `{results["best_model"]}` based on the highest ROC-AUC on the test set.',
+        f'- Selected `{results["best_model"]}` based on the highest '
+        'ROC-AUC on the test set.',
         ''
     ]
     with open(output_path, 'w', encoding='utf-8') as handle:
@@ -454,7 +512,11 @@ def tune_random_forest(
     numeric_features: list[str],
     categorical_features: list[str]
 ) -> GridSearchCV:
-    pipeline = build_pipeline(RandomForestClassifier(random_state=42), numeric_features, categorical_features)
+    pipeline = build_pipeline(
+        RandomForestClassifier(random_state=42),
+        numeric_features,
+        categorical_features,
+    )
     param_grid = {
         'model__n_estimators': [100, 200],
         'model__max_depth': [None, 5, 10],
@@ -492,13 +554,15 @@ def save_pickle_model(pipeline: Pipeline, path: str = PICKLE_MODEL_PATH) -> str:
 def save_onnx_model(
     pipeline: Pipeline,
     raw_feature_names: list[str],
-    path: str = ONNX_PATH
+    path: str = ONNX_PATH,
 ) -> str | None:
     if not ONNX_ENABLED:
         return None
 
     try:
-        initial_type = [(name, FloatTensorType([None, 1])) for name in raw_feature_names]
+        initial_type = [
+            (name, FloatTensorType([None, 1])) for name in raw_feature_names
+        ]
         onnx_model = convert_sklearn(pipeline, initial_types=initial_type)
         with open(path, 'wb') as handle:
             handle.write(onnx_model.SerializeToString())
@@ -522,7 +586,10 @@ def load_model(path: str = MODEL_PATH) -> Pipeline:
     return load_pipeline(path)
 
 
-def predict(sample: dict[str, object] | pd.DataFrame | list[dict[str, object]], path: str = MODEL_PATH) -> np.ndarray:
+def predict(
+    sample: dict[str, object] | pd.DataFrame | list[dict[str, object]],
+    path: str = MODEL_PATH,
+) -> np.ndarray:
     pipeline = load_pipeline(path)
     if isinstance(sample, list):
         sample = pd.DataFrame(sample)
@@ -640,13 +707,37 @@ def train_and_evaluate() -> dict[str, object]:
         'training_date': datetime.datetime.now().isoformat(),
         'sklearn_version': sklearn_version,
         'python_version': platform.python_version(),
-        'best_hyperparameters': rf_search.best_params_ if best_model_name != 'logistic_regression' else {'max_iter': 1000, 'random_state': 42},
+        'best_hyperparameters': (
+            rf_search.best_params_
+            if best_model_name != 'logistic_regression'
+            else {'max_iter': 1000, 'random_state': 42}
+        ),
         'evaluation_metrics': {
-            'accuracy': float(rf_test['accuracy'] if best_model_name != 'logistic_regression' else logistic_test['accuracy']),
-            'precision': float(rf_test['precision'] if best_model_name != 'logistic_regression' else logistic_test['precision']),
-            'recall': float(rf_test['recall'] if best_model_name != 'logistic_regression' else logistic_test['recall']),
-            'f1': float(rf_test['f1'] if best_model_name != 'logistic_regression' else logistic_test['f1']),
-            'roc_auc': float(rf_test['roc_auc'] if best_model_name != 'logistic_regression' else logistic_test['roc_auc']),
+            'accuracy': float(
+                rf_test['accuracy']
+                if best_model_name != 'logistic_regression'
+                else logistic_test['accuracy']
+            ),
+            'precision': float(
+                rf_test['precision']
+                if best_model_name != 'logistic_regression'
+                else logistic_test['precision']
+            ),
+            'recall': float(
+                rf_test['recall']
+                if best_model_name != 'logistic_regression'
+                else logistic_test['recall']
+            ),
+            'f1': float(
+                rf_test['f1']
+                if best_model_name != 'logistic_regression'
+                else logistic_test['f1']
+            ),
+            'roc_auc': float(
+                rf_test['roc_auc']
+                if best_model_name != 'logistic_regression'
+                else logistic_test['roc_auc']
+            ),
         },
         'feature_names': numeric_features + categorical_features,
         'target_column': 'target',
