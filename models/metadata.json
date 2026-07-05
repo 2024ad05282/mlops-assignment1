@@ -1,0 +1,40 @@
+{
+  "model_name": "HeartDiseaseClassificationModel",
+  "algorithm": "Logistic Regression",
+  "training_date": "2026-07-05T12:51:32.677296",
+  "sklearn_version": "1.9.0",
+  "python_version": "3.13.7",
+  "best_hyperparameters": {
+    "max_iter": 1000,
+    "random_state": 42
+  },
+  "evaluation_metrics": {
+    "accuracy": 0.8852459016393442,
+    "precision": 0.8387096774193549,
+    "recall": 0.9285714285714286,
+    "f1": 0.8813559322033898,
+    "roc_auc": 0.9664502164502166
+  },
+  "feature_names": [
+    "age",
+    "trestbps",
+    "chol",
+    "thalach",
+    "oldpeak",
+    "ca",
+    "cp",
+    "exang",
+    "fbs",
+    "restecg",
+    "sex",
+    "slope",
+    "thal"
+  ],
+  "target_column": "target",
+  "saved_files": {
+    "joblib": "C:\\Users\\Priyanka\\HeartDisease-MLOps\\models\\best_pipeline.joblib",
+    "pickle": "C:\\Users\\Priyanka\\HeartDisease-MLOps\\models\\best_pipeline.pkl",
+    "mlflow_model": null,
+    "onnx": null
+  }
+}

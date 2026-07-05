@@ -1,0 +1,8 @@
+# Classification Report - Random Forest (tuned)
+
+              precision    recall  f1-score    support
+0              0.966667  0.878788  0.920635  33.000000
+1              0.870968  0.964286  0.915254  28.000000
+accuracy       0.918033  0.918033  0.918033   0.918033
+macro avg      0.918817  0.921537  0.917945  61.000000
+weighted avg   0.922739  0.918033  0.918165  61.000000
