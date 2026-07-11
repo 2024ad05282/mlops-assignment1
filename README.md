@@ -28,7 +28,11 @@ This repository contains a Heart Disease prediction pipeline with data ingestion
 4. Start API:
    - `uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8000`
 
-5. Monitoring and logging:
+6. Start MLflow UI:
+   - `.\start_mlflow_ui.ps1`
+   - Then open `http://127.0.0.1:5001`
+
+7. Monitoring and logging:
    - API logs are emitted for each request and response.
    - Prometheus metrics are exposed at `http://localhost:8001/metrics`.
    - Prometheus config is available at `deployment/monitoring/prometheus.yml`.

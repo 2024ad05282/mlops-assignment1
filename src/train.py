@@ -1,9 +1,8 @@
 import os
 import sys
 
-from model import train_and_evaluate
-
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+from model import train_and_evaluate
 
 if __name__ == '__main__':
     print('Starting feature engineering and model development...')

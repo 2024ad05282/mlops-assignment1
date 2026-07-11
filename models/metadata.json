@@ -1,7 +1,7 @@
 {
   "model_name": "HeartDiseaseClassificationModel",
   "algorithm": "Logistic Regression",
-  "training_date": "2026-07-11T12:41:09.220391",
+  "training_date": "2026-07-11T15:41:55.360514",
   "sklearn_version": "1.9.0",
   "python_version": "3.13.7",
   "best_hyperparameters": {
@@ -32,8 +32,8 @@
   ],
   "target_column": "target",
   "saved_files": {
-    "joblib": "C:\\Users\\Priyanka\\HeartDisease-MLOps\\models\\best_pipeline.joblib",
-    "pickle": "C:\\Users\\Priyanka\\HeartDisease-MLOps\\models\\best_pipeline.pkl",
+    "joblib": "c:\\Users\\Priyanka\\HeartDisease-MLOps\\models\\best_pipeline.joblib",
+    "pickle": "c:\\Users\\Priyanka\\HeartDisease-MLOps\\models\\best_pipeline.pkl",
     "mlflow_model": null,
     "onnx": null
   }
