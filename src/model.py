@@ -583,7 +583,15 @@ def load_pipeline(path: str = MODEL_PATH) -> Pipeline:
 
 
 def load_model(path: str = MODEL_PATH) -> Pipeline:
-    return load_pipeline(path)
+    try:
+        return load_pipeline(path)
+    except Exception as err:
+        print(
+            f'Warning: failed to load model from {path} due to {type(err).__name__}: {err}'
+        )
+        print('Retraining a fresh model to restore a compatible pipeline...')
+        train_and_evaluate()
+        return load_pipeline(path)
 
 
 def predict(
