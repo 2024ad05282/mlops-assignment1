@@ -8,3 +8,15 @@ image:
 service:
   type: ClusterIP
   port: 8000
+
+grafana:
+  enabled: true
+  image:
+    repository: grafana/grafana
+    tag: 10.1.6
+  adminPassword: admin
+  service:
+    type: ClusterIP
+    port: 3000
+  datasources:
+    url: http://prometheus.default.svc.cluster.local:9090

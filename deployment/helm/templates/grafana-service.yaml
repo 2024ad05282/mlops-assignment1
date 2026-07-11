@@ -1,0 +1,15 @@
+{{- if .Values.grafana.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-grafana
+spec:
+  type: {{ .Values.grafana.service.type }}
+  selector:
+    app: {{ .Release.Name }}-grafana
+  ports:
+    - port: {{ .Values.grafana.service.port }}
+      targetPort: {{ .Values.grafana.service.port }}
+      protocol: TCP
+      name: http
+{{- end }}

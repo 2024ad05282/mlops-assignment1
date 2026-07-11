@@ -1,7 +1,7 @@
 {
   "model_name": "HeartDiseaseClassificationModel",
   "algorithm": "Logistic Regression",
-  "training_date": "2026-07-05T14:11:22.398697",
+  "training_date": "2026-07-11T12:11:05.090567",
   "sklearn_version": "1.9.0",
   "python_version": "3.13.7",
   "best_hyperparameters": {
