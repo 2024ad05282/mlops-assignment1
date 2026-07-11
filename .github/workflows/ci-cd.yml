@@ -85,6 +85,15 @@ jobs:
         run: |
           python src/train.py
 
+      - name: Upload training artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-artifacts
+          path: |
+            models/**
+            report/**
+            mlflow.db
+
       - name: Run build validation
         run: |
           python -m compileall .
