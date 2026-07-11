@@ -33,6 +33,7 @@ def _build_feature_vector(payload: dict) -> list[float]:
         payload['thal'],
     ]
 
+
 app = FastAPI(title='Heart Disease Prediction API')
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
